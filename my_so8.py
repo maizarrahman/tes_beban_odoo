@@ -74,7 +74,7 @@ class Seller(OdooLocustUserXml):
     @task(10)
     def read_partners(self):
         cust_model = self.client.get_model('res.partner')
-        cust_ids = cust_model.search([])
+        cust_ids = cust_model.search([('name', 'ilike', fake.last_name())])
         custs = cust_model.read(cust_ids)
         # create 1 customer
         country_id = random.randint(1,99)
@@ -99,7 +99,7 @@ class Seller(OdooLocustUserXml):
     @task(5)
     def read_products(self):
         prod_model = self.client.get_model('product.product')
-        ids = prod_model.search([])
+        ids = prod_model.search([('name', 'ilike', fake.vehicle_model())])
         prods = prod_model.read(ids)
         # create 1 product
         ids = categ_model.search([('name', '=', 'Vehicle')])
