@@ -4,15 +4,22 @@ from faker import Faker
 from faker_vehicle import VehicleProvider
 
 
+cust_num = 10   # number of customers
+prod_num = 10   # number of products
+so_num   = 10   # number of sale orders
+line_num = 10   # maximum number of lines in a sale order
+
+
 fake = Faker()
 fake.add_provider(VehicleProvider)
+
 
 connection = odoolib.get_connection(hostname="localhost", database="new12", \
     login="admin", password="admin", protocol="jsonrpc", port=8012)
 
 # 1.000.000 customers
 cust_model = connection.get_model('res.partner')
-for i in range(10):
+for i in range(cust_num):
     # create 1 customer
     country_id = random.randint(1,99)
     phone1 = '+' + str(country_id)
@@ -40,7 +47,7 @@ if ids:
     parent_id = ids[0]
 else:
     parent_id = categ_model.create({'name': 'Vehicle',})
-for i in range(10):
+for i in range(prod_num):
     prod = fake.vehicle_object()
     # create 1 product category if not exist
     # print(prod)
@@ -64,7 +71,7 @@ for i in range(10):
 
 # 10.000.000 sale orders
 so_model = connection.get_model('sale.order')
-for i in range(10):
+for i in range(so_num):
     cust_ids = cust_model.search([
         ('customer', '=', True), 
         ('parent_id', '=', False), 
@@ -78,7 +85,7 @@ for i in range(10):
         ('product_tmpl_id.active', '=', True),
         ])
     prod_len = len(prod_ids)
-    id1 = random.randint(1, 20)
+    id1 = random.randint(1, line_num)
 
     order_line = []
     ids = []
