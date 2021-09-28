@@ -13,6 +13,9 @@ else:
 from faker_vehicle import VehicleProvider
 
 
+line_num = 10  # maximum number of lines in a sale order
+
+
 def send(self, service_name, method, *args):
     url = '%s/%s' % (self.url, service_name)
     service = ServerProxy(url)
@@ -63,6 +66,7 @@ class OdooLocustUserXml(HttpUser):
 
 fake = Faker()
 fake.add_provider(VehicleProvider)
+
 
 class Seller(OdooLocustUserXml):
     wait_time = between(0.1, 10)
@@ -149,25 +153,27 @@ class Seller(OdooLocustUserXml):
             ('product_tmpl_id.active', '=', True),
             ])
         prod_len = len(prod_ids)
-        id1 = random.randint(1, 20)
 
-        order_line = []
-        ids = []
-        for i in range(id1):
+        id2 = random.randint(0, prod_len-1)
+        order_id = so_model.create({
+            'partner_id': cust_id,
+            'order_line': [(0, 0, {
+                                'product_id': prod_ids[id2],
+                                'product_uom_qty': random.randint(1, 123),
+                                })],
+            })
+        ids = [id2]
+        for i in range(random.randint(1, line_num)):
             id2 = random.randint(0, prod_len-1)
             if id2 in ids:
                 continue
             else:
                 ids.append(id2)
-            order_line.append((0, 0, {
-                                'product_id': prod_ids[id2],
-                                'product_uom_qty': random.randint(1, 10),
-                                }))
-
-        order_id = so_model.create({
-            'partner_id': cust_id,
-            'order_line': order_line,
-        })
+            line_model.create({
+                'order_id': order_id,
+                'product_id': prod_ids[id2],
+                'product_uom_qty': random.randint(1, 123),
+                })
 
         if random.randint(0, 1234)%2 == 0:
             so_model.action_button_confirm([order_id])  # Odoo 8

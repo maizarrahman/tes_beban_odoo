@@ -9,6 +9,9 @@ import sys
 from locust import HttpUser, events
 
 
+line_num = 10  # maximum number of lines in a sale order
+
+
 def send(self, service_name, method, *args):
     if service_name == "object" and method == "execute_kw":
         call_name = "%s : %s" % args[3:5]
@@ -143,29 +146,31 @@ class Seller(OdooLocustUser):
             ('product_tmpl_id.sale_ok', '=', True),
             ('product_tmpl_id.active', '=', True)])
         prod_len = len(prod_ids)
-        id1 = random.randint(1, 20)
 
         id2 = random.randint(0, prod_len-1)
         line_model = self.client.get_model('sale.order.line')
         ids = line_model.search([('product_id', '=', id2)])
 
-        order_line = []
-        ids = []
-        for i in range(id1):
+        id2 = random.randint(0, prod_len-1)
+        order_id = so_model.create({
+            'partner_id': cust_id,
+            'order_line': [(0, 0, {
+                                'product_id': prod_ids[id2],
+                                'product_uom_qty': random.randint(1, 123),
+                                })],
+            })
+        ids = [id2]
+        for i in range(random.randint(1, line_num)):
             id2 = random.randint(0, prod_len-1)
             if id2 in ids:
                 continue
             else:
                 ids.append(id2)
-            order_line.append((0, 0, {
-                                'product_id': prod_ids[id2],
-                                'product_uom_qty': random.randint(1, 10),
-                                }))
-
-        order_id = so_model.create({
-            'partner_id': cust_id,
-            'order_line': order_line,
-        })
+            line_model.create({
+                'order_id': order_id,
+                'product_id': prod_ids[id2],
+                'product_uom_qty': random.randint(1, 123),
+                })
 
         if random.randint(0, 1234)%2 == 0:
             so_model.action_confirm([order_id])  # Odoo 12
