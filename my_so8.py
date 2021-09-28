@@ -1,4 +1,5 @@
 from locust import task, between
+# from OdooLocust.OdooLocustUser import OdooLocustUser
 import random
 from faker import Faker
 import odoolib
@@ -65,11 +66,11 @@ fake.add_provider(VehicleProvider)
 
 class Seller(OdooLocustUserXml):
     wait_time = between(0.1, 10)
-    port = 8008
-    database = "new8"
-    login = "admin"
-    password = "admin"
-    protocol = "xmlrpc"
+    # port = 8008
+    # database = "new8"
+    # login = "admin"
+    # password = "admin"
+    # protocol = "xmlrpc"
 
     @task(10)
     def read_partners(self):
