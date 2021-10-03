@@ -19,16 +19,16 @@ connection = odoolib.get_connection(hostname="localhost", database="new8", \
 cust_model = connection.get_model('res.partner')
 for i in range(cust_num):
     # create 1 customer
-    country_id = random.randint(1,99)
-    phone1 = '+' + str(country_id)
+    country_id = random.randint(0,252)
+    phone1 = '+' + str(country_id+1)
     phone2 = phone1 + fake.numerify(text=' ## ') + fake.numerify(text='###')
-    name1 = fake.name().replace('Mr. ','').replace('Mrs. ','')
+    name1 = fake.first_name() + ' ' + fake.last_name()
     domain = fake.domain_name(levels=1)
     cust_id = cust_model.create({
         'name': name1,
         'street': fake.street_address(),
         'phone': phone2 + fake.numerify(text='-####'),
-        'job': fake.job(),
+        'function': fake.job(),
         'email': name1.lower().replace(' ','.') + '@' + domain,
         'website': 'https://www.' + domain,
         'city': fake.city(),
@@ -58,12 +58,13 @@ for i in range(prod_num):
             'parent_id': parent_id,
             })
     # create 1 product
+    price = round(random.uniform(1000.0, 9999.99), 2)
     prod_id = prod_model.create({
         'name': prod['Make'] + ' ' + prod['Model'] + ' ' + str(prod['Year']),
         'categ_id': categ_id,
         'type': 'product',
-        'list_price': round(random.uniform(0.0, 1.0)*10000.0, 2),
-        'standard_price': round(random.uniform(0.0, 1.0)*10000.0, 2),
+        'list_price': price,
+        'standard_price': round(price * random.uniform(0.5, 0.9), 2),
         'default_code': fake.bothify(text='????-####', letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
         })
 

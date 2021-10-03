@@ -80,18 +80,21 @@ class Seller(OdooLocustUserXml):
     def read_partners(self):
         cust_model = self.client.get_model('res.partner')
         cust_ids = cust_model.search([('name', 'ilike', fake.last_name())])
+        while not cust_ids:
+            cust_ids = cust_model.search([('name', 'ilike', fake.last_name())])
         custs = cust_model.read(cust_ids)
+        res = cust_model.write(cust_ids, {'job': fake.text(max_nb_chars=30)})
         # create 1 customer
         country_id = random.randint(1,99)
         phone1 = '+' + str(country_id)
         phone2 = phone1 + fake.numerify(text=' ## ') + fake.numerify(text='###')
-        name1 = fake.name().replace('Mr. ','').replace('Mrs. ','')
+        name1 = fake.first_name() + ' ' + fake.last_name()
         domain = fake.domain_name(levels=1)
         cust_id = cust_model.create({
             'name': name1,
             'street': fake.street_address(),
             'phone': phone2 + fake.numerify(text='-####'),
-            'job': fake.job(),
+            'function': fake.job(),
             'email': name1.lower().replace(' ','.') + '@' + domain,
             'website': 'https://www.' + domain,
             'city': fake.city(),
@@ -105,33 +108,36 @@ class Seller(OdooLocustUserXml):
     def read_products(self):
         prod_model = self.client.get_model('product.product')
         ids = prod_model.search([('name', 'ilike', fake.vehicle_model())])
+        while not ids:
+            ids = prod_model.search([('name', 'ilike', fake.vehicle_model())])
         prods = prod_model.read(ids)
+        res = prod_model.write(ids, {'image_medium': fake.image(size=(256, 256), image_format='png', hue=None, luminosity=None)})
         # create 1 product
         ids = categ_model.search([('name', '=', 'Vehicle')])
         if ids:
             parent_id = ids[0]
         else:
             parent_id = categ_model.create({'name': 'Vehicle',})
-        for i in range(10):
-            prod = fake.vehicle_object()
-            # create 1 product category if not exist
-            ids = categ_model.search([('name', '=', prod['Category'])])
-            if ids:
-                categ_id = ids[0]
-            else:
-                categ_id = categ_model.create({
-                    'name': prod['Category'],
-                    'parent_id': parent_id,
-                    })
-            # create 1 product
-            prod_id = prod_model.create({
-                'name': prod['Make'] + ' ' + prod['Model'] + ' ' + str(prod['Year']),
-                'categ_id': categ_id,
-                'type': 'product',
-                'list_price': round(random.uniform(0.0, 1.0)*10000.0, 2),
-                'standard_price': round(random.uniform(0.0, 1.0)*10000.0, 2),
-                'default_code': fake.bothify(text='????-####', letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+        prod = fake.vehicle_object()
+        # create 1 product category if not exist
+        ids = categ_model.search([('name', '=', prod['Category'])])
+        if ids:
+            categ_id = ids[0]
+        else:
+            categ_id = categ_model.create({
+                'name': prod['Category'],
+                'parent_id': parent_id,
                 })
+        # create 1 product
+        price = round(random.uniform(1000.0, 9999.99), 2)
+        prod_id = prod_model.create({
+            'name': prod['Make'] + ' ' + prod['Model'] + ' ' + str(prod['Year']),
+            'categ_id': categ_id,
+            'type': 'product',
+            'list_price': price,
+            'standard_price': round(price * random.uniform(0.5, 0.9), 2),
+            'default_code': fake.bothify(text='????-####', letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+            })
 
 
     @task(20)
