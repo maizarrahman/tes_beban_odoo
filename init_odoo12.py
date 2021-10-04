@@ -107,5 +107,5 @@ for i in range(so_num):
             'product_uom_qty': random.randint(1, 123),
             })
 
-    if random.randint(0, 1234)%2 == 0:
+    if random.randint(0, 123)%2 == 0:
         so_model.action_confirm([order_id])  # Odoo 12
