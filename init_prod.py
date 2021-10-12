@@ -4,13 +4,13 @@ from faker import Faker
 from faker_vehicle import VehicleProvider
 
 
-prod_num = 1   # number of products
+prod_num = 1000   # number of products
 host = "localhost"
-port = 8012
-database = "new12"
+port = 8008
+database = "new8"
 login = "admin"
 password = "admin"
-protocol = "jsonrpc"
+protocol = "xmlrpc"
 
 fake = Faker()
 fake.add_provider(VehicleProvider)

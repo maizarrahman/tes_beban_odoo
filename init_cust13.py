@@ -35,5 +35,5 @@ for i in range(cust_num):
         'country_id': country_id,
         'mobile': phone1 + ' ' + fake.numerify(text='###-####-####'),
         'is_company': False,
-        'customer': True,  # odoo 8-12
+        'customer_rank': 1,  # odoo 13 up
     })

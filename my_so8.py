@@ -169,7 +169,7 @@ class Seller(OdooLocustUserXml):
                                 })],
             })
         ids = [id2]
-        for i in range(random.randint(1, line_num)):
+        for k in range(random.randint(1, line_num)):
             id2 = random.randint(0, prod_len-1)
             if id2 in ids:
                 continue

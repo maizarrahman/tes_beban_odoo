@@ -29,11 +29,12 @@ for i in range(cust_num):
         'name': name1,
         'street': fake.street_address(),
         'phone': phone1 + fake.numerify(text=' ## ###-####'),
-        'function': fake.job(),
+        'comment': fake.catch_phrase(),
         'email': name1.lower().replace(' ','.') + '@' + domain,
+        'website': 'https://www.' + domain,
         'city': fake.city(),
         'country_id': country_id,
         'mobile': phone1 + ' ' + fake.numerify(text='###-####-####'),
-        'is_company': False,
-        'customer': True,  # odoo 8-12
+        'is_company': True,
+        'supplier_rank': 1,  # odoo 13 up
     })
