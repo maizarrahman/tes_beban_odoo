@@ -5,11 +5,11 @@ import datetime
 po_num = 100
 line_num = 56
 host = "localhost"
-port = 8008
-database = "new8"
+port = 8012
+database = "new12"
 login = "admin"
 password = "admin"
-protocol = "xmlrpc"
+protocol = "jsonrpc"
 
 connection = odoolib.get_connection(hostname=host, database=database, \
     login=login, password=password, protocol=protocol, port=port)
@@ -18,7 +18,7 @@ prod_model = connection.get_model('product.product')
 supl_model = connection.get_model('res.partner')
 po_model = connection.get_model('purchase.order')
 line_model = connection.get_model('purchase.order.line')
-loc_model = connection.get_model('stock.location')
+pick_model = connection.get_model('stock.picking.type')
 
 for i in range(po_num):
     supl_ids = supl_model.search([
@@ -37,17 +37,16 @@ for i in range(po_num):
     id2 = random.randint(0, prod_len-1)
     prod_id = prod_ids[id2]
     prod = prod_model.read([prod_id])
-
-    loc_ids = loc_model.search([('usage','=','internal')])
-    if len(loc_ids) > 1:
-        id3 = random.randint(0, len(loc_ids)-1)
+    
+    pick_ids = pick_model.search([('code','=','incoming')])
+    if len(pick_ids) > 1:
+        id3 = random.randint(0, len(pick_ids)-1)
     else:
         id3 = 0
-    
+
     order_id = po_model.create({
         'partner_id': supl_id,
-        'location_id': loc_ids[id3],
-        'pricelist_id': 2,
+        'picking_type_id': pick_ids[id3],
         'order_line': [(0, 0, {
             'product_id': prod_id,
             'name': prod[0]['name'],
@@ -79,8 +78,5 @@ for i in range(po_num):
             'product_qty': random.randint(1,123),
             })
     # confirm purchase
-    if random.randint(0,123)%2 == 0:
-        try:
-            po_model.signal_workflow([order_id],'purchase_confirm')
-        except:
-            pass
+    # if random.randint(0,123)%2 == 0:
+    po_model.button_confirm([order_id])
